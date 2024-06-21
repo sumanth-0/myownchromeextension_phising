@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phishing Detection</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(270deg,#ffafbd ,#ffc3a0);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        textarea {
+            height: 100px;
+            resize: none;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p {
+            font-size: 16px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .result-real {
+            color: green;
+        }
+        .result-fake {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phishing Detection</h1>
+        <form id="phishing-form">
+            <label for="text">Enter the URL:</label>
+            <textarea name="text" id="text" cols="30" rows="10" aria-label="Enter the URL"></textarea>
+            <button type="submit">Predict</button>
+        </form>
+        <p>Prediction: <span id="prediction"></span></p>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#phishing-form').on('submit', function(event) {
+                event.preventDefault();
+                var text = $('#text').val();
+                if (isValidURL(text)) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/predict',
+                        data: {'text': text},
+                        success: function(data) {
+                            var prediction = data.prediction;
+                            if (prediction == 0) {
+                                $('#prediction').text('The website is a phishing website').addClass('result-fake').removeClass('result-real');
+                            } else {
+                                $('#prediction').text('The website is a legitimate website').addClass('result-real').removeClass('result-fake');
+                            }
+                        },
+                        error: function() {
+                            $('#prediction').text('Error occurred while predicting').addClass('result-fake').removeClass('result-real');
+                        }
+                    });
+                } else {
+                    alert('Please enter a valid URL.');
+                }
+            });
+
+            function isValidURL(string) {
+                var res = string.match(/(https?:\/\/[^\s]+)/g);
+                return (res !== null);
+            }
+        });
+    </script>
+</body>
+</html>
